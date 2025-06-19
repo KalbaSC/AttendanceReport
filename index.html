@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة الحضور - نادي كلباء</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/papaparse@5.3.2/papaparse.min.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #111;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background: #111;
+      border-bottom: 3px solid #f4e733;
+      padding: 15px;
+      text-align: center;
+    }
+    footer {
+      border-top: 3px solid #f4e733;
+      margin-top: 40px;
+      font-size: 14px;
+    }
+    .container {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    h2 {
+      color: #f4e733;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #f4e733;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #222;
+    }
+    .hidden {
+      display: none;
+    }
+    input[type="password"] {
+      padding: 10px;
+      width: 200px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      padding: 10px;
+      background-color: #f4e733;
+      color: black;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h2>لوحة حضور المخيم الصيفي - نادي كلباء</h2>
+</header>
+
+<div class="container" id="login">
+  <p>كلمة المرور:</p>
+  <input type="password" id="password">
+  <button onclick="checkPassword()">دخول</button>
+</div>
+
+<div class="container hidden" id="dashboard">
+  <h2>قائمة الحضور اليوم</h2>
+  <table id="todayTable">
+    <thead>
+      <tr><th>الاسم الكامل</th><th>الوقت</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>قائمة الحضور هذا الأسبوع</h2>
+  <table id="weekTable">
+    <thead>
+      <tr><th>الاسم الكامل</th><th>التاريخ</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<footer>
+  © 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة
+</footer>
+
+<script>
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTz-mZAnHYKbd7h9ZzE_9aIbbHbLzmz8fdUwvf3WpKHEuJ0OZqp_q2CBWcCzKDiQL2v7B3jAovKVDqt/pub?output=csv';
+const ADMIN_PASSWORD = 'kalbaSC2025';
+
+function checkPassword() {
+  const input = document.getElementById('password').value;
+  if (input === ADMIN_PASSWORD) {
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    loadData();
+  } else {
+    alert('كلمة المرور غير صحيحة');
+  }
+}
+
+function loadData() {
+  Papa.parse(SHEET_URL, {
+    download: true,
+    header: true,
+    complete: function(results) {
+      const data = results.data;
+      const today = new Date().toISOString().split('T')[0];
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+
+      const todayTable = document.querySelector('#todayTable tbody');
+      const weekTable = document.querySelector('#weekTable tbody');
+
+      data.forEach(row => {
+        const fullName = row['Name'];
+        const scanDate = row['Scan Date']?.split('T')[0];
+        const timestamp = row['Timestamp'];
+
+        if (scanDate === today) {
+          const tr = `<tr><td>${fullName}</td><td>${timestamp}</td></tr>`;
+          todayTable.innerHTML += tr;
+        }
+
+        if (new Date(scanDate) >= weekAgo) {
+          const tr = `<tr><td>${fullName}</td><td>${scanDate}</td></tr>`;
+          weekTable.innerHTML += tr;
+        }
+      });
+    }
+  });
+}
+</script>
+</body>
+</html>
