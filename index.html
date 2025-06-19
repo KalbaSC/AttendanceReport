@@ -126,7 +126,7 @@ function loadData() {
       const weekTable = document.querySelector('#weekTable tbody');
 
       data.forEach(row => {
-        const fullName = row['Name'];
+        const fullName = row['Full Name']; 
         const scanDate = row['Scan Date']?.split('T')[0];
         const timestamp = row['Timestamp'];
 
