@@ -275,6 +275,19 @@
 };
 
 let isLoggedIn = false;
+
+    window.onload = () => {
+  const storedRole = localStorage.getItem("role");
+  if (storedRole && ROLES[storedRole]) {
+    isLoggedIn = true;
+    currentRole = storedRole;
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    document.getElementById("logoutNav").style.display = "inline-block";
+    loadData();
+  }
+};
+
 let currentRole = "";
 
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1jqMSk0t44D0nNcxhvuVCqIsboGca-Gt_kdQN3X9dFmw/export?format=csv&gid=0';
@@ -293,6 +306,7 @@ function checkPassword() {
   if (ROLES[selectedRole] === inputPass) {
     isLoggedIn = true;
     currentRole = selectedRole;
+    localStorage.setItem("role", selectedRole);
     document.getElementById("login").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
     document.getElementById("logoutNav").style.display = "inline-block";
@@ -385,6 +399,7 @@ function checkPassword() {
       doc.save("attendance.pdf");
     }
     function logout() {
+      localStorage.removeItem("role");
       isLoggedIn = false;
       currentRole = "";
       document.getElementById('dashboard').classList.add('hidden');
