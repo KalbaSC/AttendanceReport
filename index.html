@@ -330,7 +330,6 @@ function checkPassword() {
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
-          const data = results.data.filter(row =>  row['Full Name'] && row['Game']?.toLowerCase().includes(currentRole));
           const todayStr = new Date().toISOString().split('T')[0];
           const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
           const monthAgo = new Date(); monthAgo.setMonth(monthAgo.getMonth() - 1);
