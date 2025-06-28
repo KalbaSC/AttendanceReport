@@ -10,6 +10,7 @@
   <script src="https://unpkg.com/papaparse@5.3.2/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     @font-face {
       font-family: 'NotoKufiArabic';
@@ -23,61 +24,119 @@
       margin: 0;
       padding: 0;
     }
-    header {
+
+    .page-wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header-container {
       background: #111;
       border-bottom: 3px solid #f4e733;
       padding: 15px;
-      text-align: center;
     }
-    footer {
-      background: #111;
-      border-top: 3px solid #f4e733;
-      margin-top: 40px;
+
+    .header-right {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .logos {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      height: 60px;
+    }
+
+    .divider {
+      width: 3px;
+      height: 50px;
+      background-color: #f4e733;
+    }
+
+    .header-info {
+      text-align: right;
+      color: white;
+    }
+
+    .arabic-name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .english-name {
       font-size: 14px;
-      text-align: center;
-      padding: 10px;
     }
-    .topbar {
-      background: #222;
+
+    .attendance-nav {
+      background-color: #222;
+      border-top: 3px solid #f4e733;
+      border-bottom: 3px solid #f4e733;
+    }
+
+    .attendance-nav ul {
       display: flex;
       justify-content: center;
-      gap: 40px;
-      padding: 10px;
-      border-bottom: 2px solid #f4e733;
+      list-style: none;
+      margin: 0;
+      padding: 0;
     }
-    .topbar button {
-      background: none;
-      border: none;
+
+    .attendance-nav li {
+      padding: 15px 25px;
       color: #f4e733;
-      font-size: 18px;
+      font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s;
     }
+
+    .attendance-nav li:hover {
+      background-color: #333;
+    }
+
+    .main-title {
+      text-align: center;
+      color: #f4e733;
+      font-size: 24px;
+      margin-top: 20px;
+    }
+
     .container {
-      padding: 20px;
-      max-width: 1300px;
-      margin: auto;
+      padding: 30px;
+      max-width: 1400px;
+      width: 95%;
+      margin: 40px auto;
       background: rgba(0, 0, 0, 0.85);
       border-radius: 12px;
+      box-shadow: 0 0 30px rgba(244, 231, 51, 0.3);
     }
-    h2 {
-      color: #f4e733;
-    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 15px;
     }
+
     th, td {
       border: 1px solid #f4e733;
       padding: 10px;
       text-align: center;
     }
+
     th {
       background-color: #222;
     }
+
     .hidden {
       display: none;
     }
+
     input[type="password"], input[type="text"] {
       padding: 10px;
       width: 200px;
@@ -85,6 +144,7 @@
       border: none;
       margin: 5px;
     }
+
     button {
       padding: 10px;
       background-color: #f4e733;
@@ -94,156 +154,221 @@
       cursor: pointer;
       margin: 5px;
     }
+
     .summary {
       margin: 15px 0;
       color: #f4e733;
-      font-size: 18px;
     }
+
     .filter-section {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 10px;
     }
+
     .filter-section input {
       flex: 1;
     }
+
+    footer {
+      background: #111;
+      border-top: 3px solid #f4e733;
+      padding: 15px;
+      text-align: center;
+      font-size: 14px;
+      margin-top: auto;
+    }
   </style>
 </head>
+
 <body>
-<header>
-  <img src="logo.png" alt="Logo" height="60">
-  <img src="Picture3.png" alt="Logo" height="60">
-  <div>نادي كلباء الرياضي الثقافي<br>KALBA SPORTS & CULTURAL CLUB</div>
-</header>
-<div class="topbar">
-  <button onclick="showTab('today')">اليوم</button>
-  <button onclick="showTab('week')">هذا الأسبوع</button>
-  <button onclick="showTab('month')">هذا الشهر</button>
-</div>
-<div class="container">
-  <h2>لوحة حضور المخيم الصيفي - نادي كلباء</h2>
-  <div class="filter-section">
-    <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
-    <input type="text" id="searchGame" placeholder="بحث باللعبة..." onkeyup="filterTable()">
+  <div class="page-wrapper">
+
+    <header class="header-container">
+      <div class="header-right">
+        <div class="logos">
+          <img src="Picture3.png" alt="شعار الشارقة" class="logo">
+          <div class="divider"></div>
+          <img src="logo.png" alt="شعار نادي كلباء" class="logo">
+        </div>
+        <div class="header-info">
+          <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
+          <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="attendance-nav">
+      <ul>
+        <li onclick="showTab('today')">اليوم</li>
+        <li onclick="showTab('week')">هذا الأسبوع</li>
+        <li onclick="showTab('month')">هذا الشهر</li>
+      </ul>
+    </nav>
+
+    <div class="container">
+      <h2 class="main-title">لوحة حضور المخيم الصيفي - نادي كلباء</h2>
+    </div>
+
+    <div class="container" id="login">
+      <p>كلمة المرور:</p>
+      <input type="password" id="password">
+      <button onclick="checkPassword()">دخول</button>
+    </div>
+
+    <div class="container hidden" id="dashboard">
+      <div class="filter-section">
+        <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
+        <input type="text" id="searchGame" placeholder="بحث باللعبة..." onkeyup="filterTable()">
+      </div>
+
+      <button onclick="exportToExcel()">💾 Excel</button>
+      <button onclick="exportToPDF()">📄 PDF</button>
+
+      <div id="tables">
+        <div id="todayTableWrapper">
+          <h2>قائمة الحضور اليوم</h2>
+          <table id="todayTable">
+            <thead>
+              <tr><th>الاسم الكامل</th><th>اللعبة</th><th>الوقت</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="summary" id="summary"></div>
+
+        <div id="weekTableWrapper" class="hidden">
+          <h2>قائمة الحضور هذا الأسبوع</h2>
+          <table id="weekTable">
+            <thead>
+              <tr><th>الاسم الكامل</th><th>اللعبة</th><th>التاريخ</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div id="monthTableWrapper" class="hidden">
+          <h2>قائمة الحضور هذا الشهر</h2>
+          <table id="monthTable">
+            <thead>
+              <tr><th>الاسم الكامل</th><th>اللعبة</th><th>التاريخ</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      © 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة
+    </footer>
   </div>
-  <div class="actions">
-    <button onclick="exportToPDF()">📄 PDF</button>
-    <button onclick="exportToExcel()">💾 Excel</button>
-  </div>
-  <div id="summary" class="summary"></div>
-  <div id="todayTableWrapper">
-    <h2>قائمة الحضور اليوم</h2>
-    <table id="todayTable">
-      <thead><tr><th>الاسم الكامل</th><th>اللعبة</th><th>الوقت</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <div id="weekTableWrapper" class="hidden">
-    <h2>قائمة الحضور هذا الأسبوع</h2>
-    <table id="weekTable">
-      <thead><tr><th>الاسم الكامل</th><th>اللعبة</th><th>التاريخ</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <div id="monthTableWrapper" class="hidden">
-    <h2>قائمة الحضور هذا الشهر</h2>
-    <table id="monthTable">
-      <thead><tr><th>الاسم الكامل</th><th>اللعبة</th><th>التاريخ</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-<footer>
-  © 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة
-</footer>
-<script>
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1jqMSk0t44D0nNcxhvuVCqIsboGca-Gt_kdQN3X9dFmw/export?format=csv&gid=0';
 
-function showTab(tab) {
-  document.getElementById('todayTableWrapper').classList.add('hidden');
-  document.getElementById('weekTableWrapper').classList.add('hidden');
-  document.getElementById('monthTableWrapper').classList.add('hidden');
-  document.getElementById('summary').style.display = tab === 'today' ? 'block' : 'none';
-  document.getElementById(`${tab}TableWrapper`).classList.remove('hidden');
-}
+  <script>
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1jqMSk0t44D0nNcxhvuVCqIsboGca-Gt_kdQN3X9dFmw/export?format=csv&gid=0';
+    const ADMIN_PASSWORD = 'kalbaSC2025';
 
-function loadData() {
-  Papa.parse(SHEET_URL, {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    complete: function(results) {
-      const data = results.data.filter(row => row['Full Name']);
-      const today = new Date().toISOString().split('T')[0];
-      const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
-      const monthAgo = new Date(); monthAgo.setMonth(monthAgo.getMonth() - 1);
+    document.getElementById("password").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        checkPassword();
+      }
+    });
 
-      const todayTbody = document.querySelector('#todayTable tbody');
-      const weekTbody = document.querySelector('#weekTable tbody');
-      const monthTbody = document.querySelector('#monthTable tbody');
+    function checkPassword() {
+      const input = document.getElementById('password').value;
+      if (input === ADMIN_PASSWORD) {
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        loadData();
+      } else {
+        alert('كلمة المرور غير صحيحة');
+      }
+    }
 
-      let presentCount = 0;
+    function showTab(tab) {
+      document.getElementById('todayTableWrapper').classList.add('hidden');
+      document.getElementById('weekTableWrapper').classList.add('hidden');
+      document.getElementById('monthTableWrapper').classList.add('hidden');
+      document.getElementById(`${tab}TableWrapper`).classList.remove('hidden');
+      document.getElementById("summary").style.display = (tab === "today") ? "block" : "none";
+    }
 
-      data.forEach(row => {
-        const fullName = row['Full Name'];
-        const game = row['Game'] || '-';
-        const scanDate = (row['Scan Date'] || '').split('T')[0];
-        const timestamp = row['Timestamp'];
-        const scan = new Date(scanDate);
-        const todayStr = new Date().toISOString().split('T')[0];
+    function loadData() {
+      Papa.parse(SHEET_URL, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          const data = results.data.filter(row => row['Full Name']);
+          const todayStr = new Date().toISOString().split('T')[0];
+          const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+          const monthAgo = new Date(); monthAgo.setMonth(monthAgo.getMonth() - 1);
 
-        if (!fullName || !scanDate) return;
+          const todayTbody = document.querySelector('#todayTable tbody');
+          const weekTbody = document.querySelector('#weekTable tbody');
+          const monthTbody = document.querySelector('#monthTable tbody');
+          let presentCount = 0;
 
-        if (scanDate === todayStr) {
-          todayTbody.innerHTML += `<tr><td>${fullName}</td><td>${game}</td><td>${timestamp}</td></tr>`;
-          presentCount++;
-        }
-        if (scan >= weekAgo) {
-          weekTbody.innerHTML += `<tr><td>${fullName}</td><td>${game}</td><td>${scanDate}</td></tr>`;
-        }
-        if (scan >= monthAgo) {
-          monthTbody.innerHTML += `<tr><td>${fullName}</td><td>${game}</td><td>${scanDate}</td></tr>`;
+          data.forEach(row => {
+            const fullName = row['Full Name'];
+            const game = row['Game'] || '-';
+            const scanDate = (row['Scan Date'] || '').split('T')[0];
+            const timestamp = row['Timestamp'];
+            const scan = new Date(scanDate);
+
+            if (!fullName || !scanDate) return;
+
+            if (scanDate === todayStr) {
+              todayTbody.innerHTML += `<tr><td>${fullName}</td><td>${game}</td><td>${timestamp}</td></tr>`;
+              presentCount++;
+            }
+
+            if (scan >= weekAgo) {
+              weekTbody.innerHTML += `<tr><td>${fullName}</td><td>${game}</td><td>${scanDate}</td></tr>`;
+            }
+
+            if (scan >= monthAgo) {
+              monthTbody.innerHTML += `<tr><td>${fullName}</td><td>${game}</td><td>${scanDate}</td></tr>`;
+            }
+          });
+
+          document.getElementById("summary").innerText = `إجمالي الحضور اليوم: ${presentCount}`;
         }
       });
-
-      document.getElementById("summary").innerText = `إجمالي الحضور اليوم: ${presentCount}`;
     }
-  });
-}
 
-function filterTable() {
-  const nameFilter = document.getElementById("searchName").value.toLowerCase();
-  const gameFilter = document.getElementById("searchGame").value.toLowerCase();
-  const visibleTable = document.querySelector('table:not(.hidden) tbody');
+    function filterTable() {
+      const nameFilter = document.getElementById("searchName").value.toLowerCase();
+      const gameFilter = document.getElementById("searchGame").value.toLowerCase();
+      const visibleTable = document.querySelector('table:not(.hidden) tbody');
 
-  visibleTable.querySelectorAll("tr").forEach(row => {
-    const name = row.cells[0]?.innerText.toLowerCase();
-    const game = row.cells[1]?.innerText.toLowerCase();
-    row.style.display = name.includes(nameFilter) && game.includes(gameFilter) ? "" : "none";
-  });
-}
+      visibleTable.querySelectorAll("tr").forEach(row => {
+        const name = row.cells[0]?.innerText.toLowerCase();
+        const game = row.cells[1]?.innerText.toLowerCase();
+        row.style.display = name.includes(nameFilter) && game.includes(gameFilter) ? "" : "none";
+      });
+    }
 
-function exportToExcel() {
-  const visibleTable = document.querySelector('table:not(.hidden)');
-  const wb = XLSX.utils.table_to_book(visibleTable);
-  XLSX.writeFile(wb, "attendance.xlsx");
-}
+    function exportToExcel() {
+      const visibleTable = document.querySelector('table:not(.hidden)');
+      const wb = XLSX.utils.table_to_book(visibleTable);
+      XLSX.writeFile(wb, "attendance.xlsx");
+    }
 
-function exportToPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const visibleTable = document.querySelector('table:not(.hidden)');
-  const rows = Array.from(visibleTable.querySelectorAll("tbody tr")).map(row =>
-    Array.from(row.cells).map(cell => cell.innerText)
-  );
-  const head = Array.from(visibleTable.querySelectorAll("thead tr th")).map(th => th.innerText);
-  doc.text("Attendance Report", 10, 10);
-  doc.autoTable({ head: [head], body: rows });
-  doc.save("attendance.pdf");
-}
-
-loadData();
-</script>
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const visibleTable = document.querySelector('table:not(.hidden)');
+      const rows = Array.from(visibleTable.querySelectorAll("tbody tr")).map(row =>
+        Array.from(row.cells).map(cell => cell.innerText)
+      );
+      const head = Array.from(visibleTable.querySelectorAll("thead tr th")).map(th => th.innerText);
+      doc.text("Attendance Report", 10, 10);
+      doc.autoTable({ head: [head], body: rows });
+      doc.save("attendance.pdf");
+    }
+  </script>
 </body>
 </html>
