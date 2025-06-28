@@ -32,46 +32,41 @@
     }
 
     .header-container {
+      width: 100%;
       background: #111;
       border-bottom: 3px solid #f4e733;
-      padding: 15px;
     }
-
     .header-right {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .logos {
+      width: 100%;
+      max-width: 1170px;
+      margin: auto;
       display: flex;
       align-items: center;
-      gap: 15px;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px 42px;
+      background-color: #111;
+      color: white;
+      box-sizing: border-box;
     }
-
-    .logo {
-      height: 60px;
+    .header-right img.logo {
+      height: 70px;
     }
-
     .divider {
-      width: 3px;
-      height: 50px;
+      width: 1.5px;
+      height: 65px;
       background-color: #f4e733;
     }
-
     .header-info {
-      text-align: right;
-      color: white;
+      text-align: center;
     }
-
     .arabic-name {
-      font-size: 18px;
       font-weight: bold;
+      font-size: 20px;
     }
-
     .english-name {
       font-size: 14px;
+      color: #f4e733;
     }
 
     .attendance-nav {
@@ -186,18 +181,16 @@
   <div class="page-wrapper">
 
     <header class="header-container">
-      <div class="header-right">
-        <div class="logos">
-          <img src="Picture3.png" alt="شعار الشارقة" class="logo">
-          <div class="divider"></div>
-          <img src="logo.png" alt="شعار نادي كلباء" class="logo">
-        </div>
-        <div class="header-info">
-          <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
-          <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
-        </div>
-      </div>
-    </header>
+  <div class="header-right">
+    <img src="Picture3.png" alt="شعار الشارقة" class="logo">
+    <div class="divider"></div>
+    <img src="logo.png" alt="شعار نادي كلباء" class="logo">
+    <div class="header-info">
+      <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
+      <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
+    </div>
+  </div>
+</header>
 
     <nav class="attendance-nav">
       <ul>
