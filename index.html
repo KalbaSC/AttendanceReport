@@ -193,11 +193,12 @@
 </header>
 
     <nav class="attendance-nav">
-      <ul>
-        <li onclick="showTab('today')">اليوم</li>
-        <li onclick="showTab('week')">هذا الأسبوع</li>
-        <li onclick="showTab('month')">هذا الشهر</li>
-      </ul>
+   <ul>
+      <li onclick="showTab('today')">اليوم</li>
+      <li onclick="showTab('week')">هذا الأسبوع</li>
+      <li onclick="showTab('month')">هذا الشهر</li>
+      <li id="logoutNav" onclick="logout()" style="display: none; margin-right: auto;">تسجيل الخروج</li>
+    </ul>
     </nav>
 
     <div class="container">
@@ -205,6 +206,12 @@
     </div>
 
     <div class="container" id="login">
+      <p>اختر الدور:</p>
+    <select id="role">
+      <option value="football">مدرب كرة القدم</option>
+      <option value="volleyball">مدرب الكرة الطائرة</option>
+      <option value="basketball">مدرب كرة السلة</option>
+    </select>
       <p>كلمة المرور:</p>
       <input type="password" id="password">
       <button onclick="checkPassword()">دخول</button>
@@ -261,6 +268,15 @@
   </div>
 
   <script>
+    const ROLES = {
+  "football": "foot123",
+  "volleyball": "volley123",
+  "basketball": "ball123"
+};
+
+let isLoggedIn = false;
+let currentRole = "";
+
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1jqMSk0t44D0nNcxhvuVCqIsboGca-Gt_kdQN3X9dFmw/export?format=csv&gid=0';
     const ADMIN_PASSWORD = 'kalbaSC2025';
 
@@ -270,16 +286,21 @@
       }
     });
 
-    function checkPassword() {
-      const input = document.getElementById('password').value;
-      if (input === ADMIN_PASSWORD) {
-        document.getElementById('login').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        loadData();
-      } else {
-        alert('كلمة المرور غير صحيحة');
-      }
-    }
+function checkPassword() {
+  const selectedRole = document.getElementById("role").value;
+  const inputPass = document.getElementById("password").value;
+
+  if (ROLES[selectedRole] === inputPass) {
+    isLoggedIn = true;
+    currentRole = selectedRole;
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    document.getElementById("logoutNav").style.display = "inline-block";
+    loadData();
+  } else {
+    alert("كلمة المرور غير صحيحة أو الدور غير صحيح");
+  }
+}
 
     function showTab(tab) {
       document.getElementById('todayTableWrapper').classList.add('hidden');
@@ -295,7 +316,7 @@
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
-          const data = results.data.filter(row => row['Full Name']);
+          const data = results.data.filter(row =>  row['Full Name'] && row['Game']?.toLowerCase().includes(currentRole));
           const todayStr = new Date().toISOString().split('T')[0];
           const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
           const monthAgo = new Date(); monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -364,10 +385,13 @@
       doc.save("attendance.pdf");
     }
     function logout() {
-  document.getElementById('dashboard').classList.add('hidden');
-  document.getElementById('login').classList.remove('hidden');
-  document.getElementById('password').value = '';
-}
+      isLoggedIn = false;
+      currentRole = "";
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('login').classList.remove('hidden');
+      document.getElementById('password').value = '';
+      document.getElementById('logoutNav').style.display = 'none';
+   }
   </script>
 </body>
 </html>
