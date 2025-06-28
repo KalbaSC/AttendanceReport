@@ -94,9 +94,23 @@
     .filter-section input {
       flex: 1;
     }
+    html, body {
+  height: 100%;
+}
+
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+footer {
+  margin-top: auto; 
+}
   </style>
 </head>
 <body>
+<div class="page-wrapper">
 <header>
   <h2>لوحة حضور المخيم الصيفي - نادي كلباء</h2>
 </header>
@@ -251,5 +265,6 @@ function exportToPDF() {
   doc.save("attendance.pdf");
 }
 </script>
+    </div>
 </body>
 </html>
