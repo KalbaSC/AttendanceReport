@@ -2,15 +2,24 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
   <title>لوحة الحضور - نادي كلباء</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/papaparse@5.3.2/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
+    @font-face {
+      font-family: 'NotoKufiArabic';
+      src: url('NotoKufiArabic.ttf') format('truetype');
+    }
     body {
-      font-family: 'Arial', sans-serif;
-      background: #111;
+      font-family: 'NotoKufiArabic', sans-serif;
+      background: url('black_and_yellow_grunge_background.jpg') no-repeat center center fixed;
+      background-size: cover;
       color: white;
       margin: 0;
       padding: 0;
@@ -30,6 +39,8 @@
       padding: 20px;
       max-width: 1000px;
       margin: auto;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 12px;
     }
     h2 {
       color: #f4e733;
@@ -55,6 +66,7 @@
       width: 200px;
       border-radius: 8px;
       border: none;
+      margin: 5px;
     }
     button {
       padding: 10px;
@@ -66,8 +78,21 @@
       margin: 5px;
     }
     .summary {
-      margin-top: 15px;
+      margin: 15px 0;
       color: #f4e733;
+    }
+    .tabs button {
+      padding: 10px 20px;
+      margin: 5px;
+    }
+    .filter-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .filter-section input {
+      flex: 1;
     }
   </style>
 </head>
@@ -75,48 +100,60 @@
 <header>
   <h2>لوحة حضور المخيم الصيفي - نادي كلباء</h2>
 </header>
-
 <div class="container" id="login">
   <p>كلمة المرور:</p>
   <input type="password" id="password">
   <button onclick="checkPassword()">دخول</button>
 </div>
-
 <div class="container hidden" id="dashboard">
+  <div class="tabs">
+    <button onclick="showTab('today')">اليوم</button>
+    <button onclick="showTab('week')">هذا الأسبوع</button>
+    <button onclick="showTab('month')">هذا الشهر</button>
+  </div>
+
+  <div class="filter-section">
+    <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
+    <input type="text" id="searchGame" placeholder="بحث باللعبة..." onkeyup="filterTable()">
+  </div>
+
   <div class="summary" id="summary"></div>
-  <input type="text" id="search" placeholder="بحث بالاسم..." onkeyup="searchTable()">
   <button onclick="exportToExcel()">💾 Excel</button>
   <button onclick="exportToPDF()">📄 PDF</button>
 
-  <h2>قائمة الحضور اليوم</h2>
-  <table id="todayTable">
-    <thead>
-      <tr><th>الاسم الكامل</th><th>الوقت</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <h2>قائمة الحضور هذا الأسبوع</h2>
-  <table id="weekTable">
-    <thead>
-      <tr><th>الاسم الكامل</th><th>التاريخ</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <h2>قائمة الحضور هذا الشهر</h2>
-  <table id="monthTable">
-    <thead>
-      <tr><th>الاسم الكامل</th><th>التاريخ</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div id="tables">
+    <div id="todayTableWrapper">
+      <h2>قائمة الحضور اليوم</h2>
+      <table id="todayTable">
+        <thead>
+          <tr><th>الاسم الكامل</th><th>اللعبة</th><th>الوقت</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div id="weekTableWrapper" class="hidden">
+      <h2>قائمة الحضور هذا الأسبوع</h2>
+      <table id="weekTable">
+        <thead>
+          <tr><th>الاسم الكامل</th><th>اللعبة</th><th>التاريخ</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div id="monthTableWrapper" class="hidden">
+      <h2>قائمة الحضور هذا الشهر</h2>
+      <table id="monthTable">
+        <thead>
+          <tr><th>الاسم الكامل</th><th>اللعبة</th><th>التاريخ</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 </div>
-
 <footer>
   © 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة
 </footer>
-
 <script>
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1jqMSk0t44D0nNcxhvuVCqIsboGca-Gt_kdQN3X9dFmw/export?format=csv&gid=0';
 const ADMIN_PASSWORD = 'kalbaSC2025';
@@ -132,6 +169,13 @@ function checkPassword() {
   }
 }
 
+function showTab(tab) {
+  document.getElementById('todayTableWrapper').classList.add('hidden');
+  document.getElementById('weekTableWrapper').classList.add('hidden');
+  document.getElementById('monthTableWrapper').classList.add('hidden');
+  document.getElementById(`${tab}TableWrapper`).classList.remove('hidden');
+}
+
 function loadData() {
   Papa.parse(SHEET_URL, {
     download: true,
@@ -143,59 +187,68 @@ function loadData() {
       const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
       const monthAgo = new Date(); monthAgo.setMonth(monthAgo.getMonth() - 1);
 
-      const tbodyToday = document.querySelector('#todayTable tbody');
-      const tbodyWeek = document.querySelector('#weekTable tbody');
-      const tbodyMonth = document.querySelector('#monthTable tbody');
+      const todayTbody = document.querySelector('#todayTable tbody');
+      const weekTbody = document.querySelector('#weekTable tbody');
+      const monthTbody = document.querySelector('#monthTable tbody');
 
       let presentCount = 0;
 
       data.forEach(row => {
         const fullName = row['Full Name'];
+        const game = row['Game'] || '-';
         const scanDate = (row['Scan Date'] || '').split('T')[0];
         const timestamp = row['Timestamp'];
+        const scan = new Date(scanDate);
+        const todayStr = new Date().toISOString().split('T')[0];
 
         if (!fullName || !scanDate) return;
 
-        const scan = new Date(scanDate);
-        if (scanDate === today) {
-          tbodyToday.innerHTML += `<tr><td>${fullName}</td><td>${timestamp}</td></tr>`;
+        if (scanDate === todayStr) {
+          todayTbody.innerHTML += `<tr><td>${fullName}</td><td>${game}</td><td>${timestamp}</td></tr>`;
           presentCount++;
         }
         if (scan >= weekAgo) {
-          tbodyWeek.innerHTML += `<tr><td>${fullName}</td><td>${scanDate}</td></tr>`;
+          weekTbody.innerHTML += `<tr><td>${fullName}</td><td>${game}</td><td>${scanDate}</td></tr>`;
         }
         if (scan >= monthAgo) {
-          tbodyMonth.innerHTML += `<tr><td>${fullName}</td><td>${scanDate}</td></tr>`;
+          monthTbody.innerHTML += `<tr><td>${fullName}</td><td>${game}</td><td>${scanDate}</td></tr>`;
         }
       });
 
-      document.getElementById("summary").innerText = `الحضور اليوم: ${presentCount}`;
+      document.getElementById("summary").innerText = `إجمالي الحضور اليوم: ${presentCount}`;
     }
   });
 }
 
-function searchTable() {
-  const input = document.getElementById("search").value.toLowerCase();
-  document.querySelectorAll("#todayTable tbody tr").forEach(row => {
+function filterTable() {
+  const nameFilter = document.getElementById("searchName").value.toLowerCase();
+  const gameFilter = document.getElementById("searchGame").value.toLowerCase();
+  const visibleTable = document.querySelector('table:not(.hidden) tbody');
+
+  visibleTable.querySelectorAll("tr").forEach(row => {
     const name = row.cells[0]?.innerText.toLowerCase();
-    row.style.display = name.includes(input) ? "" : "none";
+    const game = row.cells[1]?.innerText.toLowerCase();
+    row.style.display = name.includes(nameFilter) && game.includes(gameFilter) ? "" : "none";
   });
 }
 
 function exportToExcel() {
-  const table = document.getElementById("todayTable");
-  const wb = XLSX.utils.table_to_book(table);
-  XLSX.writeFile(wb, "today-attendance.xlsx");
+  const visibleTable = document.querySelector('table:not(.hidden)');
+  const wb = XLSX.utils.table_to_book(visibleTable);
+  XLSX.writeFile(wb, "attendance.xlsx");
 }
 
 function exportToPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.text("Today Attendance", 10, 10);
-  const rows = Array.from(document.querySelectorAll("#todayTable tbody tr"))
-    .map(row => Array.from(row.cells).map(cell => cell.innerText));
-  doc.autoTable({ head: [["Full Name", "Time"]], body: rows });
-  doc.save("today-attendance.pdf");
+  const visibleTable = document.querySelector('table:not(.hidden)');
+  const rows = Array.from(visibleTable.querySelectorAll("tbody tr")).map(row =>
+    Array.from(row.cells).map(cell => cell.innerText)
+  );
+  const head = Array.from(visibleTable.querySelectorAll("thead tr th")).map(th => th.innerText);
+  doc.text("Attendance Report", 10, 10);
+  doc.autoTable({ head: [head], body: rows });
+  doc.save("attendance.pdf");
 }
 </script>
 </body>
